@@ -46,7 +46,8 @@ class MongoInspiredCompare
   # > MongoInspiredCompare.compare( "5x", {"$gte"=>5} )
   # => false
 
-  def self.compare( val, criterion ) 
+  def self.compare( val, criterion )
+    
     if criterion.class != Hash
       val == criterion
     else
@@ -62,10 +63,6 @@ class MongoInspiredCompare
           v2.any? {|v3| compare( val, v3)}
         elsif oper == "$nin" # "$in" => [">4000", {"$gt" => -100 }]
           !v2.any? {|v3| compare( val, v3)}
-        elsif oper == "$or"
-          v2.any? {|v3| compare( val, v3)}
-        elsif oper == "$and"
-          v2.all? {|v3| compare( val, v3)}
         elsif num_val == nil
           false
         elsif oper == "$gte"
@@ -85,7 +82,15 @@ class MongoInspiredCompare
   
   
   def self.compare_object( obj, filter )
-    filter.all? {|k,v| MongoInspiredCompare.compare( obj[k], v)}
+    filter.all? do |k,v|
+      if k == "$and"
+        v.all? {|e| compare_object(obj, e)}
+      elsif k == "$or"
+        v.any? {|e| compare_object(obj, e)}
+      else
+        compare( obj[k], v)
+      end
+    end
   end
   
   private

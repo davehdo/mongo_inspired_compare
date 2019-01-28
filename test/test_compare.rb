@@ -28,11 +28,16 @@ puts "\n## Nesting"
 
 expect( 5, {"$in" => [{"$lt" => 5}, {"$gte" => 5}]}, true)
 
-puts "\n## And/or Operators"
+puts "\n## And/or Operators do not exist when comparing a single value"
+puts "\n### Use $in when you want to match any one of the criteria"
+expect( 5, {"$in" => [{"$lt" => 5}, {"$gte" => 5}]}, true)
 
-expect( 5, {"$or" => [{"$lt" => 5}, {"$gte" => 5}]}, true)
+expect( 5, {"$in" => [{"$lt" => 3}, {"$gte" => 7}]}, false)
 
-expect( 5, {"$and" => [{"$lt" => 5}, {"$gte" => 5}]}, false)
+puts "\n### Use a single object if you want to match all of the criteria"
+expect( 5, {"$lt" => 5, "$gte" => 5}, false)
+
+expect( 5, {"$lt" => 15, "$gte" => 3}, true)
 
 
 puts "\n## Invariance"

@@ -16,6 +16,21 @@ When creating a rules engine for dealing with large amounts of numeric data (lik
 => true
 ```
 
+
+### And/Or Operators
+```
+> array_of_criteria = [{:name=>"Creatinine", :value=>{"$gt"=>1.5}}, {:name=>"Potassium", :value=>{"$lt"=>3}}]
+
+> MongoInspiredCompare.compare_object( {:name=>"Creatinine", :value=>2.2}, {"$and"=>array_of_criteria} )
+=> false
+
+> MongoInspiredCompare.compare_object( {:name=>"Creatinine", :value=>2.2}, {"$or"=>array_of_criteria} )
+=> true
+
+> MongoInspiredCompare.compare_object( {:name=>"Creatinine", :value=>2.2, :drawn_by=>"Bob"}, {:name=>"Creatinine", "$or"=>[{:value=>{"$gt"=>2.5}}, {:drawn_by=>"Bob", :value=>{"$gt"=>2.0}}]} )
+=> true
+```
+
 ## Compare Value
 ### Basic Comparisons
 ```
@@ -47,14 +62,26 @@ When creating a rules engine for dealing with large amounts of numeric data (lik
 => true
 ```
 
-### And/or Operators
+### And/or operators do not exist when comparing a single value
+
+#### Use $in when you want to match any one of the criteria
 ```
-> MongoInspiredCompare.compare( 5, {"$or"=>[{"$lt"=>5}, {"$gte"=>5}]} )
+> MongoInspiredCompare.compare( 5, {"$in"=>[{"$lt"=>5}, {"$gte"=>5}]} )
 => true
 
-> MongoInspiredCompare.compare( 5, {"$and"=>[{"$lt"=>5}, {"$gte"=>5}]} )
+> MongoInspiredCompare.compare( 5, {"$in"=>[{"$lt"=>3}, {"$gte"=>7}]} )
 => false
 ```
+
+#### Use a single object if you want to match all of the criteria
+```
+> MongoInspiredCompare.compare( 5, {"$lt"=>5, "$gte"=>5} )
+=> false
+
+> MongoInspiredCompare.compare( 5, {"$lt"=>15, "$gte"=>3} )
+=> true
+```
+
 
 ### Invariance
 ```
