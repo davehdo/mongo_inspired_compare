@@ -3,7 +3,21 @@ When creating a rules engine for dealing with large amounts of numeric data (lik
  
 
 # Examples
-## Basic Comparisons
+## Compare Object
+### Basic Comparisons
+```
+> MongoInspiredCompare.compare_object( {:name=>"Creatinine", :value=>2.2}, {:name=>"Creatinine", :value=>{"$gt"=>1.5}} )
+=> true
+
+> MongoInspiredCompare.compare_object( {:name=>"Creatinine", :value=>2.2}, {:name=>"Potassium", :value=>{"$lt"=>3}} )
+=> false
+
+> MongoInspiredCompare.compare_object( {:name=>"Creatinine", :value=>"INVALID"}, {:name=>"Creatinine", :value=>{"$in"=>["INVALID", {"$lt"=>3}]}} )
+=> true
+```
+
+## Compare Value
+### Basic Comparisons
 ```
 > MongoInspiredCompare.compare( 5, 5 )
 => true
@@ -12,7 +26,7 @@ When creating a rules engine for dealing with large amounts of numeric data (lik
 => false
 ```
 
-## Basic Operators
+### Basic Operators
 ```
 > MongoInspiredCompare.compare( 5, {"$gte"=>5} )
 => true
@@ -27,13 +41,13 @@ When creating a rules engine for dealing with large amounts of numeric data (lik
 => false
 ```
 
-## Nesting
+### Nesting
 ```
 > MongoInspiredCompare.compare( 5, {"$in"=>[{"$lt"=>5}, {"$gte"=>5}]} )
 => true
 ```
 
-## And/or Operators
+### And/or Operators
 ```
 > MongoInspiredCompare.compare( 5, {"$or"=>[{"$lt"=>5}, {"$gte"=>5}]} )
 => true
@@ -42,7 +56,7 @@ When creating a rules engine for dealing with large amounts of numeric data (lik
 => false
 ```
 
-## Invariance
+### Invariance
 ```
 > MongoInspiredCompare.compare( "5", {"$gte"=>5} )
 => true

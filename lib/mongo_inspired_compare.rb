@@ -83,6 +83,11 @@ class MongoInspiredCompare
     end
   end
   
+  
+  def self.compare_object( obj, filter )
+    filter.all? {|k,v| MongoInspiredCompare.compare( obj[k], v)}
+  end
+  
   private
   def self.numerical( str )
     (str and str.strip =~ /^[\-\d\.]+$/) ? str.to_f : nil
